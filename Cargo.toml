@@ -1,0 +1,10 @@
+[workspace]
+
+members = [
+    "libapt",
+    "backend",
+    "frontend",
+    "storage", 
+    "common",
+]
+
