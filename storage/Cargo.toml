@@ -5,4 +5,6 @@ edition = "2021"
 
 [dependencies]
 common = { path = "../common" }
+diesel = { version = "2.2.5", features = ["sqlite", "returning_clauses_for_sqlite_3_35"] }
+dotenvy = "0.15.7"
 libapt = { path = "../libapt" }

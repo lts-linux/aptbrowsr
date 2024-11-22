@@ -1,25 +1,11 @@
 use diesel::prelude::*;
-use dotenvy::dotenv;
-use std::env;
 use libapt::Distro;
 
-pub mod models;
-pub mod schema;
-pub mod distro;
+use crate::models::{Repo, NewRepo};
 
-use self::models::{Repo, NewRepo};
-
-
-pub fn establish_connection() -> SqliteConnection {
-    dotenv().ok();
-
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    SqliteConnection::establish(&database_url)
-        .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
-}
 
 pub fn get_distros(conn: &mut SqliteConnection, limit: Option<i64>) -> Vec<Distro> {
-    use self::schema::distros::dsl::*;
+    use crate::schema::distros::dsl::*;
 
     let repos: Vec<Repo> = if let Some(l) = limit {
         distros
