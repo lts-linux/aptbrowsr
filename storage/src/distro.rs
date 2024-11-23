@@ -1,75 +1,46 @@
 use diesel::prelude::*;
 use libapt::Distro;
 
-use crate::models::{Repo, NewRepo};
+use crate::models::{DbDistro, NewDistro};
 
+use crate::{Result, Error};
 
-pub fn get_distros(conn: &mut SqliteConnection, limit: Option<i64>) -> Vec<Distro> {
+pub fn get_distros(conn: &mut SqliteConnection, limit: Option<i64>) -> Result<Vec<Distro>> {
     use crate::schema::distros::dsl::*;
 
-    let repos: Vec<Repo> = if let Some(l) = limit {
+    let repos: Vec<DbDistro> = if let Some(l) = limit {
         distros
-            .select(Repo::as_select())
+            .select(DbDistro::as_select())
             .limit(l)
             .load(conn)
-            .expect("Error loading distros")
+            .map_err(|e| Error::from_error(&e, "get_distros"))?
     } else {
         distros
-            .select(Repo::as_select())
+            .select(DbDistro::as_select())
             .load(conn)
-            .expect("Error loading distros")
+            .map_err(|e| Error::from_error(&e, "get_distros"))?
     };
     
-    repos.into_iter().filter_map(|r| r.to_distro()).collect()    
+    Ok(repos.into_iter().filter_map(|r| r.to_distro()).collect())
 }
 
-pub fn create_repo(
+pub fn create_distro(
     conn: &mut SqliteConnection,
-    url: &str,
-    distro_name: &str,
-    distro_key: Option<&str>,
-    armored: bool,
-) -> Option<Distro> {
+    distro: Distro,
+
+) -> Result<i32> {
     use crate::schema::distros;
 
-    let new_repo = NewRepo { 
-        url: url, 
-        name: Some(distro_name),
-        path: None, 
-        key: distro_key, 
-        armored_key: armored
-    };
+    let new_distro = match NewDistro::from_distro(distro) {
+        Some(d) => Ok(d),
+        None => Err(Error::new("create_distro: invalid data!"))
+    }?;
 
-    let repo: Repo = diesel::insert_into(distros::table)
-        .values(&new_repo)
-        .returning(Repo::as_returning())
+    let d: DbDistro = diesel::insert_into(distros::table)
+        .values(&new_distro)
+        .returning(DbDistro::as_returning())
         .get_result(conn)
-        .expect("Error saving new distro");
+        .map_err(|e| Error::from_error(&e, "get_distros"))?;
 
-    repo.to_distro()
-}
-
-pub fn create_flat_repo(
-    conn: &mut SqliteConnection,
-    url: &str,
-    distro_path: &str,
-    distro_key: Option<&str>,
-    armored: bool,
-) -> Option<Distro> {
-    use crate::schema::distros;
-
-    let new_repo = NewRepo { 
-        url: url, 
-        name: None,
-        path: Some(distro_path), 
-        key: distro_key, 
-        armored_key: armored };
-
-        let repo: Repo = diesel::insert_into(distros::table)
-        .values(&new_repo)
-        .returning(Repo::as_returning())
-        .get_result(conn)
-        .expect("Error saving new flat distro");
-
-    repo.to_distro()
+    Ok(d.id)
 }

@@ -1,14 +1,14 @@
 use diesel::prelude::*;
 use dotenvy::dotenv;
 use std::env;
-use libapt::Distro;
 
+pub mod error;
 pub mod models;
 pub mod schema;
 pub mod distro;
 
-use self::models::{Repo, NewRepo};
-
+pub use error::Error;
+pub use error::Result;
 
 pub fn establish_connection() -> SqliteConnection {
     dotenv().ok();

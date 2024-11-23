@@ -7,3 +7,7 @@ edition = "2021"
 common = { path = "../common" }
 storage = { path = "../storage" }
 libapt = { path = "../libapt" }
+actix-web = "4.9.0"
+diesel = { version = "2.2.5", features = ["sqlite", "returning_clauses_for_sqlite_3_35", "r2d2"] }
+dotenvy = "0.15.7"
+serde = { version = "1.0.215", features = ["derive"] }
