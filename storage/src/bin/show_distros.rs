@@ -1,7 +1,7 @@
 use std::process::exit;
 
 use storage::{establish_connection, distro::get_distros};
-use libapt::Distro;
+use common::distro::Distro;
 
 
 fn main() {

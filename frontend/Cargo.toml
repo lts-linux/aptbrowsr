@@ -5,3 +5,9 @@ edition = "2021"
 
 [dependencies]
 common = { path = "../common" }
+gloo-net = "0.6.0"
+log = "0.4.22"
+serde = { version = "1.0.215", features = ["derive"] }
+wasm-bindgen-futures = "0.4.45"
+wasm-logger = "0.2.0"
+yew = { version = "0.21.0", features = ["csr"] }

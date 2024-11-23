@@ -1,4 +1,5 @@
 use actix_web::{web, App, HttpServer};
+use actix_cors::Cors;
 use std::io;
 use dotenvy::dotenv;
 use std::env;
@@ -25,7 +26,10 @@ async fn main() -> io::Result<()> {
 
     // start HTTP server on port 8080
     HttpServer::new(move || {
+        let cors = Cors::permissive();
+        
         App::new()
+            .wrap(cors)
             .app_data(web::Data::new(pool.clone()))
             .service(list_distros)
             .service(new_distro)

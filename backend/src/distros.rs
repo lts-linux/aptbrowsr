@@ -1,7 +1,7 @@
-use actix_web::error::{ErrorBadRequest};
+use actix_web::error::{ErrorBadRequest, ErrorInternalServerError};
 use actix_web::{get, web, HttpResponse, Responder, post};
 
-use libapt::Distro;
+use common::distro::Distro;
 
 use storage::distro::{get_distros, create_distro};
 
@@ -19,6 +19,8 @@ async fn list_distros(
         get_distros(&mut conn, None)
     })
     .await?;
+
+    let distros = distros.map_err(|e| ErrorInternalServerError(e))?;
 
     Ok(HttpResponse::Ok().json(distros))
 }

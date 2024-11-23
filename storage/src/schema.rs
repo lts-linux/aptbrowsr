@@ -3,10 +3,10 @@
 diesel::table! {
     distros (id) {
         id -> Integer,
-        url -> Text,
-        name -> Nullable<Text>,
-        path -> Nullable<Text>,
-        key -> Nullable<Text>,
+        repo_url -> Text,
+        name_or_path -> Text,
+        repo_key -> Nullable<Text>,
         armored_key -> Bool,
+        flat_repo -> Bool,
     }
 }
